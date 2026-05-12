@@ -91,11 +91,14 @@ return {
 	animation_fps = 30,
 
 	-- ============================================================
-	-- 키바인딩
+	-- 키바인딩 (CLI 충돌 검토 완료 버전)
 	-- ============================================================
 	disable_default_key_bindings = true,
 	keys = {
-		-- Mac 스타일 Ctrl+C / Ctrl+V
+		-- ----------------------------------------------------------
+		-- 복사/붙여넣기 (Mac 스타일)
+		-- ----------------------------------------------------------
+		-- 스마트 Ctrl+C: 선택 있으면 복사, 없으면 SIGINT 전달
 		{
 			key = "c",
 			mods = "CTRL",
@@ -109,21 +112,21 @@ return {
 				end
 			end),
 		},
+		-- Ctrl+V: 항상 붙여넣기 (vim 블록 비주얼은 Ctrl+Q로 대체)
 		{ key = "v", mods = "CTRL", action = wezterm.action.PasteFrom("Clipboard") },
 
 		-- 표준 복붙 (백업)
 		{ key = "c", mods = "CTRL|SHIFT", action = wezterm.action({ CopyTo = "ClipboardAndPrimarySelection" }) },
 		{ key = "v", mods = "CTRL|SHIFT", action = wezterm.action({ PasteFrom = "Clipboard" }) },
 
-		-- Pane 분할
+		-- ----------------------------------------------------------
+		-- Pane
+		-- ----------------------------------------------------------
 		{ key = [[\]], mods = "CTRL|ALT", action = wezterm.action({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
 		{ key = [[\]], mods = "CTRL", action = wezterm.action({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
-
-		-- [변경] Pane 닫기: Ctrl+Q → Ctrl+Shift+W
-		-- Ctrl+Q는 vim 블록 비주얼/셸로 통과시키기 위해 해제
 		{ key = "w", mods = "CTRL|SHIFT", action = wezterm.action({ CloseCurrentPane = { confirm = false } }) },
 
-		-- Pane 이동
+		-- Pane 이동 (vim 스타일)
 		{ key = "h", mods = "CTRL|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Left" }) },
 		{ key = "l", mods = "CTRL|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Right" }) },
 		{ key = "k", mods = "CTRL|SHIFT", action = wezterm.action({ ActivatePaneDirection = "Up" }) },
@@ -135,30 +138,45 @@ return {
 		{ key = "k", mods = "CTRL|SHIFT|ALT", action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }) },
 		{ key = "j", mods = "CTRL|SHIFT|ALT", action = wezterm.action({ AdjustPaneSize = { "Down", 1 } }) },
 
-		-- 탭
+		-- ----------------------------------------------------------
+		-- Tab
+		-- ----------------------------------------------------------
 		{ key = "t", mods = "CTRL", action = wezterm.action({ SpawnTab = "CurrentPaneDomain" }) },
-		{ key = "w", mods = "CTRL", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
+		-- [변경] 탭 닫기: Ctrl+W → Ctrl+Shift+T
+		-- Ctrl+W는 bash의 kill-word-backward(★★★)와 vim의 window prefix(★★★) 양쪽 모두에 필수
+		{ key = "t", mods = "CTRL|SHIFT", action = wezterm.action({ CloseCurrentTab = { confirm = false } }) },
 		{ key = "Tab", mods = "CTRL", action = wezterm.action({ ActivateTabRelative = 1 }) },
 		{ key = "Tab", mods = "CTRL|SHIFT", action = wezterm.action({ ActivateTabRelative = -1 }) },
 
-        -- 폰트 크기 (Cmd+= / Cmd+- / Cmd+0)
-        { key = "=", mods = "CTRL", action = wezterm.action.IncreaseFontSize },
-        { key = "-", mods = "CTRL", action = wezterm.action.DecreaseFontSize },
-        { key = "0", mods = "CTRL", action = wezterm.action.ResetFontSize },
+		-- ----------------------------------------------------------
+		-- 폰트 크기 (충돌 없음)
+		-- ----------------------------------------------------------
+		{ key = "=", mods = "CTRL", action = wezterm.action.IncreaseFontSize },
+		{ key = "-", mods = "CTRL", action = wezterm.action.DecreaseFontSize },
+		{ key = "0", mods = "CTRL", action = wezterm.action.ResetFontSize },
 
-        -- 검색 (Cmd+F)
-        { key = "f", mods = "CTRL", action = wezterm.action.Search({ CaseSensitiveString = "" }) },
+		-- ----------------------------------------------------------
+		-- [변경] 검색: Ctrl+F → Ctrl+Shift+F
+		-- Ctrl+F는 vim의 페이지다운, less의 다음 페이지에 필수
+		-- ----------------------------------------------------------
+		{ key = "f", mods = "CTRL|SHIFT", action = wezterm.action.Search({ CaseSensitiveString = "" }) },
 
-        -- 전체 선택 (Cmd+A) — 현재 화면 전체 텍스트 복사
-        -- 주의: 셸의 Ctrl+A(라인 시작)와 충돌하니 비추. 필요하면 SHIFT 조합으로:
-        { key = "a", mods = "CTRL|SHIFT", action = wezterm.action.SelectTextAtMouseCursor("SemanticZone") },
+		-- ----------------------------------------------------------
+		-- 화면 전체 텍스트 선택 (Ctrl+Shift+A — 충돌 없음)
+		-- ----------------------------------------------------------
+		{ key = "a", mods = "CTRL|SHIFT", action = wezterm.action.SelectTextAtMouseCursor("SemanticZone") },
 
-        -- 새 창 (Cmd+N) — WezTerm은 SpawnWindow 라고 함
-        { key = "n", mods = "CTRL", action = wezterm.action.SpawnWindow },
+		-- ----------------------------------------------------------
+		-- [변경] 새 창: Ctrl+N → Ctrl+Shift+N
+		-- Ctrl+N은 bash의 다음 히스토리 (Ctrl+P와 짝)
+		-- ----------------------------------------------------------
+		{ key = "n", mods = "CTRL|SHIFT", action = wezterm.action.SpawnWindow },
 
-
-		-- Copy 모드
-		{ key = "x", mods = "CTRL", action = "ActivateCopyMode" },
+		-- ----------------------------------------------------------
+		-- [변경] Copy 모드: Ctrl+X → Ctrl+Shift+X
+		-- Ctrl+X는 nano 종료, bash readline prefix에 필수
+		-- ----------------------------------------------------------
+		{ key = "x", mods = "CTRL|SHIFT", action = "ActivateCopyMode" },
 	},
 
 	-- 기타
