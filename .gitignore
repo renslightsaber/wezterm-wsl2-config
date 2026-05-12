@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# WezTerm 로컬 캐시 (혹시)
+*.log
+
+# 개인 환경별 오버라이드 (사용자가 .local.lua 같은 거 만들 경우 대비)
+*.local.lua
+local.lua
